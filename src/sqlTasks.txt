@@ -1,0 +1,328 @@
+https://sql-academy.org/ru/trainer
+
+task#1
+Вывести имена всех людей, которые есть в базе данных авиакомпаний
+SELECT name
+FROM Passenger;
+
+task#2
+Вывести названия всеx авиакомпаний
+
+SELECT name
+FROM Company;
+
+task#3
+Вывести все рейсы, совершенные из Москвы
+
+SELECT *
+FROM Trip
+WHERE town_from = 'Moscow';
+
+task#4
+Вывести имена людей, которые заканчиваются на "man"
+SELECT name
+FROM passenger
+WHERE name LIKE('%man')
+
+task#5
+Вывести количество рейсов, совершенных на TU-134
+SELECT COUNT(*) AS count
+FROM Trip
+WHERE plane = 'TU-134'
+
+task#6
+Какие компании совершали перелеты на Boeing
+SELECT c.name
+FROM Company AS c
+JOIN Trip AS t ON c.id = t.company
+WHERE t.plane = 'Boeing'
+GROUP BY c.name;
+
+task#7
+SELECT DISTINCT plane
+FROM trip
+WHERE town_to = 'Moscow'
+//можно кроме distinct сгрупировать по plane
+
+task#9
+Какие компании организуют перелеты из Владивостока (Vladivostok)
+SELECT c.name
+FROM Company AS c
+JOIN Trip AS t ON c.id = t.company
+WHERE town_from = 'Vladivostok';
+
+task#12
+Выведите идентификаторы всех рейсов и количество пассажиров на них.
+Обратите внимание, что на каких-то рейсах пассажиров может не быть. В этом случае выведите число "0".
+SELECT t.id, COUNT(p.passenger) AS count
+FROM Trip AS t
+LEFT JOIN Pass_in_trip AS p ON t.id = p.trip
+GROUP BY t.id
+
+task#14
+В какие города летал Bruce Willis
+SELECT t.town_to
+FROM Passenger as p
+JOIN Pass_in_trip AS pin ON p.id = pin.passenger
+LEFT JOIN Trip AS t ON pin.trip = t.id
+WHERE p.name = 'Bruce Willis'
+----------------------------------------------------------------------------------------------------------------------
+
+https://leetcode.com/problemset/?difficulty=EASY&page=1&topicSlugs=database
+--
+task#175
+Write a solution to report the first name, last name, city, and state of each person in the Person table.
+If the address of a personId is not present in the Address table, report null instead.
+Return the result table in any order.
++-------------+---------+
+| Column Name | Type    |
++-------------+---------+
+| personId    | int     |
+| lastName    | varchar |
+| firstName   | varchar |
++-------------+---------+
++-------------+---------+
+| Column Name | Type    |
++-------------+---------+
+| addressId   | int     |
+| personId    | int     |
+| city        | varchar |
+| state       | varchar |
++-------------+---------+
+
+SELECT p.firstName, p.lastName, a.city, a.state
+FROM Address AS a
+RIGHT JOIN Person AS p ON a.personId = p.personId;
+--
+task#181
+Write a solution to find the employees who earn more than their managers.
+
+Return the result table in any order.
+
+The result format is in the following example.
++-------------+---------+
+| Column Name | Type    |
++-------------+---------+
+| id          | int     |
+| name        | varchar |
+| salary      | int     |
+| managerId   | int     |
++-------------+---------+
+
+SELECT e.name AS Employee
+FROM Employee AS e
+WHERE e.salary > (SELECT salary
+                FROM Employee AS m
+                WHERE m.id = e.managerId);
+--
+task#182
+Write a solution to report all the duplicate emails. Note that it's guaranteed that the email field is not NULL.
+
+Return the result table in any order.
+
+The result format is in the following example.
++-------------+---------+
+| Column Name | Type    |
++-------------+---------+
+| id          | int     |
+| email       | varchar |
++-------------+---------+
+
+SELECT DISTINCT email AS Email
+FROM Person
+WHERE email IN (SELECT email
+                FROM Person
+                GROUP BY email
+                HAVING COUNT(email) > 1
+);
+--
+task#183
+Write a solution to find all customers who never order anything.
+
+Return the result table in any order.
+
+The result format is in the following example.
++-------------+---------+
+| Column Name | Type    |
++-------------+---------+
+| id          | int     |
+| name        | varchar |
++-------------+---------+
+
++-------------+------+
+| Column Name | Type |
++-------------+------+
+| id          | int  |
+| customerId  | int  |
++-------------+------+
+
+SELECT name AS Customers
+FROM Customers AS c
+LEFT JOIN Orders AS o ON c.id = o.customerId
+WHERE o.id IS NULL;
+--
+task#196
+Write a solution to delete all duplicate emails, keeping only one unique email with the smallest id.
+
+For SQL users, please note that you are supposed to write a DELETE statement and not a SELECT one.
+
+For Pandas users, please note that you are supposed to modify Person in place.
+
+After running your script, the answer shown is the Person table.
+The driver will first compile and run your piece of code and then show the Person table.
+The final order of the Person table does not matter.
+
++-------------+---------+
+| Column Name | Type    |
++-------------+---------+
+| id          | int     |
+| email       | varchar |
++-------------+---------+
+
+DELETE FROM Person
+WHERE id NOT IN (
+    SELECT id FROM (
+        SELECT MIN(id) AS id
+        FROM Person
+        GROUP BY email
+    ) AS q
+);
+--
+task#197
+Write a solution to find all dates' id with higher temperatures compared to its previous dates (yesterday).
+
+Return the result table in any order.
+
+The result format is in the following example.
++---------------+---------+
+| Column Name   | Type    |
++---------------+---------+
+| id            | int     |
+| recordDate    | date    |
+| temperature   | int     |
++---------------+---------+
+--
+task#511
+Write a solution to find the first login date for each player.
+
+Return the result table in any order.
+
+The result format is in the following example.
++-------------+---------+
+| Имя столбца | Тип |
++-------------+---------+
+| player_id | целое |
+| device_id | целое |
+| дата_события | дата |
+| игр_сыграно | инт |
++-------------+---------+
+
+SELECT player_id, event_date AS first_login
+FROM Activity
+WHERE(player_id, event_date) IN (SELECT player_id, MIN(event_date)
+                                FROM Activity
+                                GROUP BY player_id);
+--
+task#577
+Write a solution to report the name and bonus amount of each employee with a bonus less than 1000.
+
+Return the result table in any order.
+
+The result format is in the following example.
+
++-------------+------+
+| Column Name | Type |
++-------------+------+
+| empId       | int  |
+| bonus       | int  |
++-------------+------+
++-------------+---------+
+| Column Name | Type    |
++-------------+---------+
+| empId       | int     |
+| name        | varchar |
+| supervisor  | int     |
+| salary      | int     |
++-------------+---------+
+
+SELECT e.name, b.bonus
+FROM Employee AS e
+LEFT JOIN Bonus AS b ON e.empId = b.empId
+WHERE b.bonus < 1000 OR b.bonus IS NULL;
+--
+task#584
+Find the names of the customer that are not referred by the customer with id = 2.
+
+Return the result table in any order.
+
+The result format is in the following example.
++-------------+---------+
+| Column Name | Type    |
++-------------+---------+
+| id          | int     |
+| name        | varchar |
+| referee_id  | int     |
++-------------+---------+
+
+SELECT name
+FROM customer
+WHERE referee_id != 2 OR referee_id IS NULL;
+------------------------------------------------------------------------------------------------------------------------
+https://sql-trainer.elbrusboot.camp/
+
+task#1
+Give me a list of all invoices
+
+SELECT *
+FROM invoices;
+--
+task#2
+Give me a list of all artists
+SELECT *
+FROM artists;
+--
+task#3
+Give me the first and last names of every employee
+SELECT first_name, last_name
+FROM employees;
+--
+task#4
+Give me the names of every media type
+SELECT name
+FROM media_types;
+--
+task#5
+Give me a list of every employee by hire date in descending order
+SELECT *
+FROM employees
+ORDER BY hire_date DESC;
+--
+task#6
+Give me the hire date, first name, and last name of all employees hired before February 15, 2011
+SELECT hire_date, first_name, last_name
+FROM employees
+WHERE hire_date < '2011-02-15';
+--
+task#7
+Give me a list of all employees whose name begins with "A"
+SELECT *
+FROM employees
+WHERE first_name LIKE 'A%';
+--
+task#8
+Give me a list of all invoices from Redmond, WA
+SELECT *
+FROM invoices
+WHERE billing_city = 'Redmond'
+--
+task#9
+Give me a list of all invoices from Berlin, Germany
+SELECT *
+FROM invoices
+WHERE billing_city = 'Berlin';
+--
+task#10
+Give me a list of all invoices from Canada
+SELECT *
+FROM invoices
+WHERE billing_country = 'Canada';
